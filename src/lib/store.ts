@@ -81,20 +81,26 @@ export async function listSubmissions(): Promise<Submission[]> {
   return redis ? listSubmissionsRedis() : listSubmissionsFile();
 }
 
-export async function addSubmission(
-  entry: Omit<Submission, "id" | "createdAt">
-): Promise<Submission> {
-  const record: Submission = {
+export function buildSubmission(entry: Omit<Submission, "id" | "createdAt">): Submission {
+  return {
     ...entry,
     id: makeId(),
     createdAt: new Date().toISOString(),
   };
+}
 
+export async function persistSubmission(record: Submission): Promise<void> {
   if (redis) {
     await addSubmissionRedis(record);
   } else {
     await addSubmissionFile(record);
   }
+}
 
+export async function addSubmission(
+  entry: Omit<Submission, "id" | "createdAt">
+): Promise<Submission> {
+  const record = buildSubmission(entry);
+  await persistSubmission(record);
   return record;
 }

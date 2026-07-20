@@ -114,9 +114,11 @@ export default function Home() {
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [result, setResult] = useState<{ submission: Submission; emailSent: boolean } | null>(
-    null
-  );
+  const [result, setResult] = useState<{
+    submission: Submission;
+    emailSent: boolean;
+    saved: boolean;
+  } | null>(null);
 
   const [showAdmin, setShowAdmin] = useState(false);
   const [adminLoading, setAdminLoading] = useState(false);
@@ -528,9 +530,13 @@ export default function Home() {
                 )}
               </div>
               <p className="email-note">
-                {result.emailSent
-                  ? "담당자에게 이메일 알림을 보냈습니다."
-                  : "신청 내용은 저장되었지만 이메일 알림 전송에는 실패했습니다. 담당자가 접수 목록에서 확인할 수 있습니다."}
+                {result.emailSent && result.saved && "담당자에게 이메일 알림을 보냈습니다."}
+                {result.emailSent &&
+                  !result.saved &&
+                  "담당자에게 이메일 알림을 보냈습니다. (접수 목록 저장은 실패했지만 이메일로 확인 가능합니다.)"}
+                {!result.emailSent &&
+                  result.saved &&
+                  "신청 내용은 저장되었지만 이메일 알림 전송에는 실패했습니다. 담당자가 접수 목록에서 확인할 수 있습니다."}
               </p>
             </Reveal>
           )}

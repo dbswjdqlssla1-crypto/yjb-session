@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { addSubmission, listSubmissions } from "@/lib/store";
+import { buildSubmission, listSubmissions, persistSubmission } from "@/lib/store";
 import { sendNotificationEmail } from "@/lib/mail";
 
 export async function GET() {
@@ -45,8 +45,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 저장을 먼저 수행 — 이메일 발송이 실패해도 신청 데이터는 반드시 남는다.
-  const record = await addSubmission({
+  const record = buildSubmission({
     hasMelody,
     hasLyrics,
     hasReference,
@@ -58,6 +57,17 @@ export async function POST(req: NextRequest) {
     notes: typeof notes === "string" ? notes : "",
   });
 
+  // 저장과 이메일 발송은 서로 독립적으로 시도한다 — 한쪽이 실패해도
+  // 다른 쪽까지 막히면 안 된다 (특히 이메일은 담당자가 신청을 확인하는
+  // 사실상의 1차 채널이라 저장 실패 때문에 못 가는 일이 없어야 한다).
+  let saved = true;
+  try {
+    await persistSubmission(record);
+  } catch (err) {
+    saved = false;
+    console.error("[apply] 신청 저장 실패:", err);
+  }
+
   let emailSent = true;
   try {
     await sendNotificationEmail(record);
@@ -66,5 +76,12 @@ export async function POST(req: NextRequest) {
     console.error("[apply] 이메일 발송 실패:", err);
   }
 
-  return NextResponse.json({ submission: record, emailSent });
+  if (!saved && !emailSent) {
+    return NextResponse.json(
+      { error: "신청 접수에 실패했습니다. 잠시 후 다시 시도해주세요." },
+      { status: 500 }
+    );
+  }
+
+  return NextResponse.json({ submission: record, emailSent, saved });
 }
