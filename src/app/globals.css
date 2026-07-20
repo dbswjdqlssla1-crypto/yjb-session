@@ -750,6 +750,7 @@ textarea {
   margin: 0 auto;
   padding: 72px 24px 20px;
   text-align: center;
+  scroll-snap-align: start;
 }
 
 .info-badge {
