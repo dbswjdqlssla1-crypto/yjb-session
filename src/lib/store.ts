@@ -23,10 +23,11 @@ function makeId() {
     .toUpperCase()}`;
 }
 
-// Vercel에 Upstash Redis(또는 호환) 연동을 붙이면 이 환경변수가 자동으로 채워진다.
-// 없으면(로컬 개발 등) 파일 저장소로 자동 폴백한다.
-const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
-const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+// Vercel Marketplace에서 Upstash for Redis를 연결하면 KV_REST_API_* 이름으로
+// 환경변수가 자동으로 채워진다 (구버전/직접 연동은 UPSTASH_REDIS_REST_* 사용).
+// 둘 다 없으면(로컬 개발 등) 파일 저장소로 자동 폴백한다.
+const REDIS_URL = process.env.KV_REST_API_URL ?? process.env.UPSTASH_REDIS_REST_URL;
+const REDIS_TOKEN = process.env.KV_REST_API_TOKEN ?? process.env.UPSTASH_REDIS_REST_TOKEN;
 const REDIS_KEY = "session-sheet:submissions";
 
 const redis = REDIS_URL && REDIS_TOKEN ? new Redis({ url: REDIS_URL, token: REDIS_TOKEN }) : null;
