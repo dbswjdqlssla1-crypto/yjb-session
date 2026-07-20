@@ -128,6 +128,7 @@ export default function Home() {
 
   const [activeScene, setActiveScene] = useState(0);
   const sceneRefs = useRef<(HTMLElement | null)[]>([]);
+  const packageRef = useRef<HTMLElement | null>(null);
 
   const [flash, setFlash] = useState<{ id: number; color: "accent" | "danger" } | null>(null);
 
@@ -159,6 +160,10 @@ export default function Home() {
 
   function scrollToScene(i: number) {
     sceneRefs.current[i]?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function scrollToPackage() {
+    packageRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function updateReference(i: number, v: string) {
@@ -229,11 +234,6 @@ export default function Home() {
 
   return (
     <>
-      <div className="rec-stamp">
-        <span className="dot" />
-        REC
-      </div>
-
       {flash && (
         <div
           key={flash.id}
@@ -349,7 +349,7 @@ export default function Home() {
                 setHasReference(v);
                 triggerFlash(v);
                 if (!v) {
-                  setTimeout(() => scrollToScene(4), 420);
+                  setTimeout(() => scrollToPackage(), 420);
                 }
               }}
             />
@@ -367,7 +367,7 @@ export default function Home() {
                 <button
                   type="button"
                   className="next-btn"
-                  onClick={() => scrollToScene(4)}
+                  onClick={() => scrollToPackage()}
                 >
                   다음
                 </button>
@@ -376,30 +376,12 @@ export default function Home() {
           </Reveal>
         </section>
 
-        <section className="info-section">
-          <span className="info-badge">PROCESS</span>
-          <h2 className="info-title">진행 방식</h2>
-          <p className="info-subtext">
-            접수부터 마스터링까지, 이런 순서와 기준으로 진행됩니다. 아래 패키지를 선택하면
-            포함되는 단계가 표시됩니다.
-          </p>
-          <ol className={`process-steps${selectedPlan ? " has-selection" : ""}`}>
-            {PROCESS_STEPS.map((step, i) => (
-              <li
-                className={`process-step${
-                  selectedPlan && step.tiers.includes(selectedPlan) ? " active" : ""
-                }`}
-                key={step.title}
-              >
-                <span className="process-step-num">{String(i + 1).padStart(2, "0")}</span>
-                <span className="process-step-title">{step.title}</span>
-                <span className="process-step-desc">{step.desc}</span>
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        <section className="info-section">
+        <section
+          className="info-section"
+          ref={(el) => {
+            packageRef.current = el;
+          }}
+        >
           <span className="info-badge">PACKAGE</span>
           <h2 className="info-title">패키지 안내</h2>
           <p className="info-subtext">진행 범위에 따라 세 가지 패키지 중 선택하실 수 있습니다.</p>
@@ -425,6 +407,29 @@ export default function Home() {
               </button>
             ))}
           </div>
+        </section>
+
+        <section className="info-section">
+          <span className="info-badge">PROCESS</span>
+          <h2 className="info-title">진행 방식</h2>
+          <p className="info-subtext">
+            접수부터 마스터링까지, 이런 순서와 기준으로 진행됩니다. 위 패키지를 선택하면
+            포함되는 단계가 표시됩니다.
+          </p>
+          <ol className={`process-steps${selectedPlan ? " has-selection" : ""}`}>
+            {PROCESS_STEPS.map((step, i) => (
+              <li
+                className={`process-step${
+                  selectedPlan && step.tiers.includes(selectedPlan) ? " active" : ""
+                }`}
+                key={step.title}
+              >
+                <span className="process-step-num">{String(i + 1).padStart(2, "0")}</span>
+                <span className="process-step-title">{step.title}</span>
+                <span className="process-step-desc">{step.desc}</span>
+              </li>
+            ))}
+          </ol>
         </section>
 
         <section
