@@ -751,6 +751,7 @@ textarea {
   padding: 72px 24px 20px;
   text-align: center;
   scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 .info-badge {
