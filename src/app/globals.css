@@ -35,6 +35,8 @@ html,
 body {
   padding: 0;
   margin: 0;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 html {
@@ -200,6 +202,10 @@ body {
 
   .scene {
     padding: 72px 20px;
+  }
+
+  .scene-ghost-num {
+    font-size: clamp(120px, 42vw, 220px);
   }
 }
 
@@ -491,6 +497,8 @@ input[type="text"],
 input[type="date"],
 textarea {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   background: rgba(255, 255, 255, 0.5);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
